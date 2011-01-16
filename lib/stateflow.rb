@@ -2,6 +2,7 @@ module Stateflow
   def self.included(base)
     base.send :include, InstanceMethods
     base.extend ClassMethods
+    base.class_inheritable_accessor :machine
     Stateflow::Persistence.set(base)
   end
   
@@ -14,19 +15,18 @@ module Stateflow
   end
   
   module ClassMethods
-    attr_reader :machine
-    
+
     def stateflow(&block)
-      @machine = Stateflow::Machine.new(&block)
+      self.machine = Stateflow::Machine.new(&block)
       
-      @machine.states.values.each do |state|
+      self.machine.states.values.each do |state|
         state_name = state.name
         define_method "#{state_name}?" do
           state_name == current_state.name
         end
       end
       
-      @machine.events.keys.each do |key|
+      self.machine.events.keys.each do |key|
         define_method "#{key}" do
           fire_event(key, :save => false)
         end
