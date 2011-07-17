@@ -1,13 +1,15 @@
+require 'active_support'
+
 module Stateflow
-  def self.included(base)
-    base.send :include, InstanceMethods
-    base.extend ClassMethods
-    base.class_inheritable_accessor :machine
-    Stateflow::Persistence.set(base)
+  extend ActiveSupport::Concern
+  
+  included do |base|
+    class_inheritable_accessor :machine
+    Stateflow::Persistence.load!(base)
   end
   
   def self.persistence
-    @@persistence ||= :active_record
+    @@persistence ||= nil
   end
   
   def self.persistence=(persistence)
@@ -54,6 +56,10 @@ module Stateflow
       self.class.machine
     end
     
+    def available_states
+      machine.states.keys
+    end
+    
     private
     def fire_event(event_name, options = {})
       event = machine.events[event_name.to_sym]
@@ -69,3 +75,5 @@ module Stateflow
   autoload :Persistence, 'stateflow/persistence'
   autoload :Exception, 'stateflow/exception'
 end
+
+require 'stateflow/railtie' if defined?(Rails)

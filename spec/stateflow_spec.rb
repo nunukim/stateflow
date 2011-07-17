@@ -136,6 +136,10 @@ describe Stateflow do
     it "should respond to the machine attr accessor" do
       Robot.should respond_to(:machine)
     end
+    
+    it "should return all active persistence layers" do
+      Stateflow::Persistence.active.should == [:active_record, :mongo_mapper, :mongoid, :none]
+    end
   end
 
   describe "instance methods" do
@@ -153,6 +157,10 @@ describe Stateflow do
 
     it "should respond to the current machine" do
       @r.should respond_to(:machine)
+    end
+    
+    it "should respond to available states" do
+      @r.should respond_to(:available_states)
     end
 
     it "should respond to load from persistence" do
@@ -342,5 +350,12 @@ describe Stateflow do
       stater.current_state == "bob"
     end
   end
+  
+  describe "available states" do
+    it "should return the available states" do
+      robot = Robot.new
+      robot.available_states.should include(:red, :yellow, :green)
+    end
+  end
+  
 end
-
