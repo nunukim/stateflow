@@ -4,7 +4,7 @@ module Stateflow
   extend ActiveSupport::Concern
   
   included do |base|
-    class_inheritable_accessor :machine
+    class_attribute :machine
     Stateflow::Persistence.load!(base)
   end
   
